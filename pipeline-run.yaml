@@ -7,7 +7,7 @@ spec:
     name: foodrestaurant-ci-pipeline
   params:
     - name: IMAGE
-      value: gcr.io/YOUR_PROJECT_ID/foodrestaurant:latest
+      value: gcr.io/positive-water-468219-g2/foodrestaurant:latest
   workspaces:
     - name: shared-data
       persistentVolumeClaim:
