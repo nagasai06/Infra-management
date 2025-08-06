@@ -1,14 +1,17 @@
-apiVersion: tekton.dev/v1
+apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: foodrestaurant-ci-run
+  name: foodrestaurant-build-pipelinerun
 spec:
   pipelineRef:
-    name: foodrestaurant-ci-pipeline
+    name: foodrestaurant-build-pipeline
   params:
-    - name: IMAGE
-      value: gcr.io/positive-water-468219-g2/foodrestaurant:latest
+    - name: repo-url
+      value: https://github.com/nagasai06/FoodRestaurant.git
+    - name: image-url
+      value: gcr.io/positive-water-468219-g2/food-restaurant:latest
   workspaces:
-    - name: shared-data
+    - name: shared-workspace
       persistentVolumeClaim:
         claimName: tekton-workspace-pvc
+  serviceAccountName: build-bot
