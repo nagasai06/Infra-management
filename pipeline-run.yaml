@@ -18,6 +18,6 @@ spec:
               storage: 1Gi
   params:
     - name: repo-url
-      value: https://github.com/YOUR_USERNAME/FoodRestaurant.git
+      value: https://github.com/nagasai06/FoodRestaurant.git
     - name: image-url
       value: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app
