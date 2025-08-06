@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: foodrestaurant-ci-pipeline
+spec:
+  params:
+    - name: IMAGE
+  workspaces:
+    - name: shared-data
+  tasks:
+    - name: maven-build
+      taskRef:
+        name: maven-build
+      workspaces:
+        - name: source
+          workspace: shared-data
+
+    - name: build-and-push
+      runAfter: [maven-build]
+      taskRef:
+        name: build-and-push
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: shared-data
