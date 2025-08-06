@@ -1,17 +1,23 @@
+# pipelinerun.yaml
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: foodrestaurant-build-pipelinerun
+  name: springboot-run
 spec:
   pipelineRef:
-    name: foodrestaurant-build-pipeline
-  params:
-    - name: repo-url
-      value: https://github.com/nagasai06/FoodRestaurant.git
-    - name: image-url
-      value: gcr.io/positive-water-468219-g2/food-restaurant:latest
+    name: springboot-build-deploy
   workspaces:
     - name: shared-workspace
-      persistentVolumeClaim:
-        claimName: tekton-workspace-pvc
-  serviceAccountName: build-bot
+      volumeClaimTemplate:
+        metadata:
+          name: springboot-pvc
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+  params:
+    - name: repo-url
+      value: https://github.com/YOUR_USERNAME/FoodRestaurant.git
+    - name: image-url
+      value: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app
