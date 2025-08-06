@@ -1,27 +1,47 @@
-apiVersion: tekton.dev/v1
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: foodrestaurant-ci-pipeline
+  name: foodrestaurant-build-pipeline
 spec:
   params:
-    - name: IMAGE
+    - name: repo-url
+      type: string
+      description: Git repo URL of the Spring Boot app
+    - name: image-url
+      type: string
+      description: Full image URL to push (gcr.io/positive-water-468219-g2/food-restaurant:latest)
   workspaces:
-    - name: shared-data
+    - name: shared-workspace
   tasks:
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
     - name: maven-build
       taskRef:
-        name: maven-build
+        name: maven
+      runAfter:
+        - clone-repo
       workspaces:
         - name: source
-          workspace: shared-data
+          workspace: shared-workspace
 
-    - name: build-and-push
-      runAfter: [maven-build]
+    - name: kaniko-build
       taskRef:
-        name: build-and-push
+        name: kaniko
+      runAfter:
+        - maven-build
       params:
         - name: IMAGE
-          value: $(params.IMAGE)
+          value: $(params.image-url)
       workspaces:
         - name: source
-          workspace: shared-data
+          workspace: shared-workspace
