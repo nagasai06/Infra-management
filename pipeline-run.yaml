@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: foodrestaurant-ci-run
+spec:
+  pipelineRef:
+    name: foodrestaurant-ci-pipeline
+  params:
+    - name: IMAGE
+      value: gcr.io/YOUR_PROJECT_ID/foodrestaurant:latest
+  workspaces:
+    - name: shared-data
+      persistentVolumeClaim:
+        claimName: tekton-workspace-pvc
