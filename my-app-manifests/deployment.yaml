@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: food-restaurant
-  namespace: default   # make sure this matches your target namespace
+  namespace: default
   labels:
     app: food-restaurant
 spec:
@@ -16,8 +16,22 @@ spec:
         app: food-restaurant
     spec:
       containers:
-      - name: food-restaurant
-        image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:latest
-        command: ["java", "-jar", "app.jar"]   # override ENTRYPOINT
-        ports:
-        - containerPort: 8080
+        - name: food-restaurant
+          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:latest
+          command: ["java", "-jar", "app.jar"]
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: firestore-secret-volume
+              mountPath: /secrets
+              readOnly: true
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/firestore-secret.json
+      volumes:
+        - name: firestore-secret-volume
+          secret:
+            secretName: firestore-secret
+            items:
+              - key: firestore-secret.json
+                path: firestore-secret.json
