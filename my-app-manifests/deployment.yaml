@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: food-restaurant
+  namespace: default   # make sure this matches your target namespace
   labels:
     app: food-restaurant
 spec:
@@ -17,5 +18,6 @@ spec:
       containers:
       - name: food-restaurant
         image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:latest
+        command: ["java", "-jar", "app.jar"]   # override ENTRYPOINT
         ports:
         - containerPort: 8080
