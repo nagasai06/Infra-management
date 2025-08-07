@@ -1,8 +1,7 @@
-# pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: tekton-workspace-pvc
+  name: shared-workspace-pvc
 spec:
   accessModes:
     - ReadWriteOnce

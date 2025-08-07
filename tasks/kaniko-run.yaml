@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: kaniko-build-push-taskrun
+spec:
+  taskRef:
+    name: kaniko-build-push
+  params:
+    - name: IMAGE
+      value: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:latest
+    - name: DOCKERFILE
+      value: src/main/java/com/RestaurantFood/FoodRestaurant/Dockerfile
+    - name: CONTEXT
+      value: .
+  workspaces:
+    - name: source
+      persistentVolumeClaim:
+        claimName: shared-workspace-pvc

@@ -1,9 +1,0 @@
-apiVersion: tekton.dev/v1
-kind: PipelineResource
-metadata:
-  name: source-repo
-spec:
-  type: git
-  params:
-    - name: url
-      value: https://github.com/YOUR_USERNAME/FoodRestaurant
