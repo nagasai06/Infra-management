@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: food-restaurant
-          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:v1.0.1.3
+          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:latest
+          
           imagePullPolicy: Always
           command: ["java", "-jar", "app.jar"]
           ports:
