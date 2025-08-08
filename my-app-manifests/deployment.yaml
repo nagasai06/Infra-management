@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: food-restaurant
-          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:latest
+          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:v1.0.3
           command: ["java", "-jar", "app.jar"]
           ports:
             - containerPort: 8080
