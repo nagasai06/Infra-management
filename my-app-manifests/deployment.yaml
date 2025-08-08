@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: food-restaurant
-          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:c671e5b
+          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:f012f5b
           
           imagePullPolicy: Always
           command: ["java", "-jar", "app.jar"]
@@ -41,3 +41,4 @@ spec:
                 path: firestore-secret.json
 # Pipeline triggered at Fri Aug  8 14:09:46 UTC 2025
 # Pipeline triggered at Fri Aug  8 16:15:41 UTC 2025
+# Pipeline triggered at Fri Aug  8 19:48:09 UTC 2025
