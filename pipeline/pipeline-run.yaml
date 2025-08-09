@@ -1,0 +1,26 @@
+#This run is to run pipeline seperately without triggers and listeners>>
+
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: food-restaurant-ci-pipelinerun
+spec:
+  pipelineRef:
+    name: food-restaurant-ci-pipeline
+  taskRunTemplate:
+    podTemplate:
+      securityContext:
+        #runAsUser: 1000
+        fsGroup: 65532
+  params:
+    - name: url
+      value: <<SOURCE CODE REPO>>
+    - name: revision
+      value: master
+    - name: image-url
+      value: <<IMAGE_ARTIFACT_FROM_GCP_ARTIFACT_REPO>>
+  
+  workspaces:
+    - name: source-pvc
+      persistentVolumeClaim:
+        claimName: pipeline-pvc
