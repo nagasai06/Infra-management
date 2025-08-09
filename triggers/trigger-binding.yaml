@@ -1,0 +1,16 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: food-restaurant-pipeline-binding
+  namespace: default
+spec:
+  params:
+    - name: url
+      value: "$(body.repository.clone_url)"
+    - name: revision
+      value: "$(body.head_commit.id)"
+    - name: namespace
+      value: "default"
+    - name: image-url
+      value: "<<Image URL in GCP Artifact repository>>"
+    
