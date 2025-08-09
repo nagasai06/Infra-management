@@ -1,0 +1,140 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: food-restaurant-ci-pipeline
+spec:
+  params:
+    - name: url
+      type: string
+    - name: revision
+      type: string
+      default: master
+    - name: image-url
+      type: string
+  workspaces:
+    - name: source-pvc
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.url)
+        - name: revision
+          value: $(params.revision)
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: source-pvc
+
+    - name: maven-build
+      runAfter:
+        - git-clone
+      taskSpec:
+        params:
+          - name: image-url
+            type: string  
+        results:
+          - name: new-image-url
+            description: "Image URL with appended git commit SHA tag" 
+        workspaces:
+          - name: source
+        steps:
+          - name: get-commit-sha-and-build-image-url
+            image: alpine/git
+            workingDir: $(workspaces.source.path)
+            script: |
+              #!/bin/sh
+              set -eux
+
+              # Mark workspace directory as safe for git
+              git config --global --add safe.directory /workspace/source
+
+              # Extract short git SHA
+              COMMIT_SHA=$(git rev-parse --short HEAD)
+              echo "Commit SHA: $COMMIT_SHA"
+
+              # Extract image base (everything before ':')
+              IMAGE_BASE=$(echo "$(params.image-url)" | cut -d':' -f1)
+              echo "Image base: $IMAGE_BASE"
+
+              # Compose new image URL with commit SHA as tag
+              NEW_IMAGE_URL="${IMAGE_BASE}:${COMMIT_SHA}"
+              echo "New image URL: $NEW_IMAGE_URL"
+
+              # Output to task result
+              echo -n $NEW_IMAGE_URL > /tekton/results/new-image-url
+
+
+          - name: mvn-build
+            image: maven:3.8.5-openjdk-17
+            workingDir: $(workspaces.source.path)
+            script: |
+              mvn clean install -DskipTests
+      workspaces:
+        - name: source
+          workspace: source-pvc
+      params:
+        - name: image-url
+          value: $(params.image-url)
+
+    - name: kaniko-build
+      runAfter:
+        - maven-build
+      taskRef:
+        name: kaniko-build-push
+      params:
+        - name: IMAGE
+          value: $(tasks.maven-build.results.new-image-url)
+        - name: DOCKERFILE
+          value: Dockerfile
+        - name: CONTEXT
+          value: .
+        - name: EXTRA_ARGS
+          value: "--use-new-run"
+      workspaces:
+        - name: source
+          workspace: source-pvc
+
+    - name: push-deployment
+      runAfter:
+        - kaniko-build
+      params:
+        - name: image-url
+          value: $(tasks.maven-build.results.new-image-url)
+      taskSpec:
+        params:
+          - name: image-url
+            type: string
+        workspaces:
+          - name: source
+        steps:
+          - name: update-deployment
+            image: alpine/git
+            script: |
+              #!/bin/sh
+              set -eux
+
+              cd $(workspaces.source.path)
+
+              rm -rf manifests-repo
+              git clone <<MANIFEST_REPONAME>> manifests-repo
+              cd manifests-repo/my-app-manifests
+
+              git pull --rebase origin main
+
+              sed -i "s|image: .*|image: $(params.image-url)|" deployment.yaml
+
+              echo "# Pipeline triggered at $(date)" >> deployment.yaml
+
+              git config user.email "<<EMAIL>>"
+              git config user.name "<<USERNAME>>"
+
+              git add deployment.yaml
+              git commit -m "Update deployment image to $(params.image-url)" || echo "No changes to commit"
+              git push https://<<GIT_HUB_USERNAME>>:<<GIT_HUB_SECRET_TOKEN>>@github.com/<<USER_NAME>>/<<REPO_NAME>> <<BRANCH>>
+
+      workspaces:
+        - name: source
+          workspace: source-pvc
