@@ -7,9 +7,9 @@ spec:
     name: kaniko-build-push
   params:
     - name: IMAGE
-      value: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:latest
+      value: <<Google Cloud Artifact Repository Image URL>>
     - name: DOCKERFILE
-      value: src/main/java/com/RestaurantFood/FoodRestaurant/Dockerfile
+      value: Dockerfile
     - name: CONTEXT
       value: .
   workspaces:
