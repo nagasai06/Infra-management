@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: food-restaurant
-          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:c4f4013
+          image: us-central1-docker.pkg.dev/positive-water-468219-g2/food-restaurant/app:8b66a11
           
           imagePullPolicy: Always
           command: ["java", "-jar", "app.jar"]
@@ -49,3 +49,4 @@ spec:
 # Pipeline triggered at Sun Aug 10 00:43:35 UTC 2025
 # Pipeline triggered at Sun Aug 10 00:53:16 UTC 2025
 # Pipeline triggered at Sun Aug 10 01:04:31 UTC 2025
+# Pipeline triggered at Sun Aug 10 01:21:45 UTC 2025
